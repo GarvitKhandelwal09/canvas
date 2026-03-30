@@ -1,0 +1,29 @@
+# Node modules
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+
+# Logs
+logs/
+*.log
+
+# Vite / React build outputs
+dist/
+build/
+
+# MacOS system files
+.DS_Store
+
+# VS Code settings (optional)
+.vscode/
+
+# npm/yarn lock files (optional, if using alternate package manager)
+package-lock.json
+yarn.lock
+
+# Coverage folder (if running tests)
+coverage/
