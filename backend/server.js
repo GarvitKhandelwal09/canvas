@@ -20,8 +20,13 @@ app.get("/", (req, res) => {
 connectDB();
 
 // User routes
-const userRoutes = require('./routes/userRoutes');
-app.use('/api/users', userRoutes); // all /api/users/* routes handled in userRoutes.js
+const { login } = require('./user/controllers/login');
+const { signup } = require('./user/controllers/usercontroller');
+app.post("/sighup" ,(req,res)=>{
+    signup(req,res)
+    console.log(req.body)
+})
+ // all /api/users/* routes handled in userRoutes.js
 
 // Start server
 const PORT = process.env.PORT || 5000;

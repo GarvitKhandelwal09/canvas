@@ -1,19 +1,43 @@
-const User = require('../usermodels/userprofile')
-const bycrpt = require('bcryptjs')
+const User = require('../usermodels/userprofile');
+const bcrypt = require('bcryptjs');
 
-const signup = async(req , res) => {
-    try{
-        const{name, email, password} = req.body;
-        const hashpass = await bycrpt.hash(password,8) ;
+const signup = async (req, res) => {
+    try {
+        const { name, email, password } = req.body;
+
+        // validation
+        if (!name || !email || !password) {
+            return res.status(400).json({ message: "All fields are required" });
+        }
+
+        // check existing user
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ message: "User already exists" });
+        }
+
+        // hash password
+        const hashpass = await bcrypt.hash(password, 8);
+
+        // create user
         const user = await User.create({
-            name ,
+            name,
             email,
-            password : hashpass
+            password: hashpass
         });
-        res.json({ message: "User created", user });
-        
-    }
-catch (err) {
+
+        res.status(201).json({
+            message: "User created",
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email
+            }
+        });
+
+    } catch (err) {
         res.status(500).json({ error: err.message });
     }
 };
+
+module.exports = { signup };
