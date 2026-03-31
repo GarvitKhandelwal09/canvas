@@ -10,7 +10,7 @@ function Login() {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://localhost:5000/sighup", {
+      const res = await fetch("http://localhost:5000/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }), // <-- send name
@@ -32,7 +32,8 @@ function Login() {
   };
 
   return (
-    <div className="w-full max-w-sm p-6 bg-white rounded-lg shadow-md">
+    <div className="flex items-center">
+    <div className= "w-full max-w-sm p-6 bg-white rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-4 text-center">Login</h2>
       {message && <p className="mb-4 text-center text-red-500">{message}</p>}
       <form onSubmit={handleLogin} className="flex flex-col gap-4">
@@ -67,6 +68,7 @@ function Login() {
           Login
         </button>
       </form>
+    </div>
     </div>
   );
 }
