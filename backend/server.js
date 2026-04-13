@@ -23,8 +23,12 @@ connectDB();
 const { login } = require('./user/controllers/login');
 const { signup } = require('./user/controllers/usercontroller');
 app.post("/login" ,(req,res)=>{
-    signup(req,res)
+    login(req,res)
     console.log(req.body)
+})
+
+app.post('/signup' ,(req, res)=> {
+    signup(req, res)
 })
 
  // all /api/users/* routes handled in userRoutes.js
