@@ -9,7 +9,7 @@ const Layout = () => {
     <>
       <Navigation />
       {/* Content area with top padding for the fixed nav */}
-      <div className="pt-24 min-h-screen">
+      <div className=" min-h-screen">
         <Outlet />
       </div>
       <Footer />

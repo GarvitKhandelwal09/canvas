@@ -1,15 +1,22 @@
-const express = require('express');
-const cors = require('cors');
-const connectDB = require('./config/dbConfig');
-require('dotenv').config();
+import express from 'express';
+import cors from 'cors';
+import connectDB from './config/dbConfig.js';
+import multer from 'multer';
+import dotenv from 'dotenv';
+
+import { login } from './user/controllers/login.js';
+import { signup } from './user/controllers/usercontroller.js';
+
+dotenv.config();
 
 const app = express();
+const upload = multer({ storage: multer.memoryStorage() });
 
 // Middleware
 app.use(express.json());
-app.use(cors()); // ✅ properly called
+app.use(cors());
 
-console.log("ENV CHECK:", process.env.MONGO_URI);
+console.log("ENV CHECK:");
 
 // Test route
 app.get("/", (req, res) => {
@@ -20,22 +27,28 @@ app.get("/", (req, res) => {
 connectDB();
 
 // User routes
-const { login } = require('./user/controllers/login');
-const { signup } = require('./user/controllers/usercontroller');
-app.post("/login" ,(req,res)=>{
-    login(req,res)
-    console.log(req.body)
-})
+app.post("/login", login);
 
-app.post('/signup' ,(req, res)=> {
-    signup(req, res)
-})
+app.post("/signup", signup);
 
- // all /api/users/* routes handled in userRoutes.js
+app.post("/upload", upload.single("file"), (req, res) => {
+    console.log(req.file);
 
-// Start server
+    if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    res.json({
+        message: "File uploaded successfully",
+        file: {
+            filename: req.file.originalname,
+            mimetype: req.file.mimetype,
+            size: req.file.size
+        }
+    });
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
-

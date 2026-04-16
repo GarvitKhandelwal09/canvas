@@ -25,8 +25,9 @@ const Navigation = () => {
         {/* Links */}
         <div className="flex items-center gap-8">
           {[
-            { name: 'Practice', path: '/' },
-            { name: 'History', path: '/history' },
+            { name: 'Home', path: '/home'},
+            { name: 'Practice', path: '/practice' },
+            { name: 'history', path: '/history' },
             { name: 'Account', path: '/account' }
           ].map((link) => (
             <NavLink

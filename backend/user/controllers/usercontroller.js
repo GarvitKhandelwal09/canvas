@@ -1,5 +1,5 @@
-const User = require('../usermodels/userprofile');
-const bcrypt = require('bcryptjs');
+import User from '../usermodels/userprofile.js';
+import bcrypt from 'bcryptjs';
 
 const signup = async (req, res) => {
     try {
@@ -40,4 +40,4 @@ const signup = async (req, res) => {
     }
 };
 
-module.exports = { signup };
+export { signup };

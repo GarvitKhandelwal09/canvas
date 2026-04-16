@@ -9,6 +9,7 @@ import Navigation from './components/navigation'
 import Footer from './components/footer'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './pages/layout'
+import PracticePage from './pages/practicepage'
 function App() {
 
 
@@ -18,9 +19,10 @@ function App() {
    {/* NavLink is now inside the Router context */}
      {/* Add padding so nav doesn't cover content */}
         <Routes>
-          <Route path="/login" element={<Login />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-<Route element = {Layout}>
+        <Route path="/practice" element={<PracticePage />} />
+<Route element = {<Layout/>}>
   <Route path="/" element={<Landingpage />} />
           <Route path="/home" element={<Home />} />
 </Route>
