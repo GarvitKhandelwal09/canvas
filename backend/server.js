@@ -3,7 +3,7 @@ import cors from 'cors';
 import connectDB from './config/dbConfig.js';
 import multer from 'multer';
 import dotenv from 'dotenv';
-
+import { extractTextFromPDF } from './file/fileextract.js';
 import { login } from './user/controllers/login.js';
 import { signup } from './user/controllers/usercontroller.js';
 
@@ -31,12 +31,14 @@ app.post("/login", login);
 
 app.post("/signup", signup);
 
-app.post("/upload", upload.single("file"), (req, res) => {
+app.post("/upload", upload.single("file"),async(req, res) => {
     console.log(req.file);
 
     if (!req.file) {
         return res.status(400).json({ message: "No file uploaded" });
     }
+    const resumedata = await extractTextFromPDF(req.file.buffer);
+    console.log(" resume se data nikal liya gya hai",resumedata);
 
     res.json({
         message: "File uploaded successfully",
