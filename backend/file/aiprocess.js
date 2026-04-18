@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import dotenv from "dotenv";        
+import dotenv from "dotenv";    
+import File from "../models/file.js";    
 dotenv.config();
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
@@ -20,9 +21,11 @@ Summarize this resume in a structured way:
 Resume:
 ${resumeText}
 `;
-
+    
     const result = await model.generateContent(prompt);
     const response = await result.response;
-
+    const file = await File.create({
+        content : response.text()
+    })
     return response.text();
 };
