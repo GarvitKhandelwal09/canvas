@@ -24,6 +24,7 @@ ${resumeText}
     
     const result = await model.generateContent(prompt);
     const response = await result.response;
+    
     const file = await File.create({
         content : response.text()
     })

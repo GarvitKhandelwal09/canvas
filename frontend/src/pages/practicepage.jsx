@@ -2,18 +2,10 @@ import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
-const questions = [
-  "Tell me about yourself.",
-  "What is your strongest project and why?",
-  "Explain a challenge you faced and how you solved it.",
-  "Why should we hire you?"
-];
-
 const PracticePage = () => {
   const navigate = useNavigate();
-  const [step, setStep] = useState(0);
   const [messages, setMessages] = useState([
-    { role: "bot", text: "Welcome to your AI interview. I will be evaluating your responses based on clarity, logic, and technical depth. Let's begin." }
+    { role: "bot", text: "Welcome to your AI interview. I am analyzing your profile now. Let's begin when you are ready." }
   ]);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
@@ -36,32 +28,48 @@ const PracticePage = () => {
     return `${m}:${s < 10 ? "0" : ""}${s}`;
   };
 
-  const handleSend = () => {
+ // ✅ PURE BACKEND CONNECTION WITH CONTEXT
+  const handleSend = async () => {
     if (!input.trim() || timeLeft <= 0) return;
 
-    const userMsg = { role: "user", text: input };
-    setMessages((prev) => [...prev, userMsg]);
+    const userText = input;
+    const currentMessages = [...messages]; // Capture current state for history
+    
+    setMessages((prev) => [...prev, { role: "user", text: userText }]);
     setInput("");
     setTyping(true);
 
-    setTimeout(() => {
-      setTyping(false);
-      const next = step + 1;
+    try {
+      const res = await fetch("http://localhost:5000/practice", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ 
+          message: userText,
+          history: currentMessages // 3. Send history to backend
+        })
+      });
 
-      if (next < questions.length) {
-        setStep(next);
-        setMessages((prev) => [
-          ...prev,
-          { role: "bot", text: `Understood. Moving to the next area: ${questions[next]}` }
-        ]);
-      } else {
-        setMessages((prev) => [
-          ...prev,
-          { role: "bot", text: "Interview complete. Analyzing your performance now..." }
-        ]);
-      }
-    }, 1500);
+      const data = await res.json();
+
+      setMessages((prev) => [
+        ...prev,
+        { role: "bot", text: data.reply }
+      ]);
+
+    } catch (err) {
+      setMessages((prev) => [
+        ...prev,
+        { role: "bot", text: "Error connecting to AI server. Check backend." }
+      ]);
+    } finally {
+      setTyping(false);
+    }
   };
+
+  // Calculate how many times you and the AI have gone back and forth
+  const exchangeCount = Math.floor(messages.length / 2);
 
   return (
     <motion.div 
@@ -102,22 +110,22 @@ const PracticePage = () => {
           </div>
 
           <div className="space-y-6">
+            {/* Dynamic Focus Header (Since we don't know the questions anymore) */}
             <motion.div
-              key={step}
               initial={{ x: -20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ type: "spring", stiffness: 100 }}
             >
-              <p className="text-[10px] uppercase tracking-widest text-slate-400 mb-2">Current Focus</p>
+              <p className="text-[10px] uppercase tracking-widest text-slate-400 mb-2">Current Mode</p>
               <h3 className="text-xl font-light leading-snug text-slate-800">
-                {step < questions.length ? questions[step] : "Evaluation Phase"}
+                Live AI Assessment
               </h3>
             </motion.div>
             
             <div className="grid grid-cols-2 gap-4 pt-6 border-t border-slate-100">
               <div>
-                <p className="text-[9px] uppercase tracking-widest text-slate-400">Progress</p>
-                <p className="text-lg font-serif italic">{step + 1} of {questions.length}</p>
+                <p className="text-[9px] uppercase tracking-widest text-slate-400">Exchanges</p>
+                <p className="text-lg font-serif italic">{exchangeCount}</p>
               </div>
               <motion.div
                 animate={timeLeft < 60 ? { scale: [1, 1.05, 1] } : {}}
@@ -194,7 +202,7 @@ const PracticePage = () => {
           <div className="max-w-4xl mx-auto relative">
             <input
               value={input}
-              disabled={timeLeft <= 0}
+              disabled={timeLeft <= 0 || typing}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSend()}
               placeholder="Type your response..."
@@ -204,7 +212,7 @@ const PracticePage = () => {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={handleSend}
-              disabled={!input.trim() || timeLeft <= 0}
+              disabled={!input.trim() || timeLeft <= 0 || typing}
               className="absolute right-3 top-1/2 -translate-y-1/2 bg-slate-900 text-white px-6 py-3 rounded-2xl text-[10px] uppercase tracking-widest font-bold disabled:opacity-20 disabled:grayscale transition-all"
             >
               Send
