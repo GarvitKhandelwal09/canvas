@@ -84,7 +84,6 @@ app.post("/practice", async (req, res) => {
         const result = await chat.sendMessage(message);
         const response = await result.response;
         const aiResponse = response.text();
-
         res.json({
             reply: aiResponse
         });
